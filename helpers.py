@@ -116,7 +116,7 @@ def preprocess_Do(data_path="Experiment_data/Original_dataset/AIVIVN_2019",
 def sample_data(data_path="", 
                 output_path="", 
                 percent_sample_size=50):
-    df = pd.read_csv(data_path)
+    df = pd.read_csv(data_path, index_col=0)
     df = df.sample(frac=percent_sample_size/100)
     df.to_csv(output_path)
     return df
@@ -124,8 +124,8 @@ def sample_data(data_path="",
 def concate_data(data_path1="", 
                  data_path2="", 
                  output_path=""):
-    df1 = pd.read_csv(data_path1)
-    df2 = pd.read_csv(data_path2)
+    df1 = pd.read_csv(data_path1, index_col=0)
+    df2 = pd.read_csv(data_path2, index_col=0)
     df = pd.concat([df1, df2])
     df.to_csv(output_path)
     return df

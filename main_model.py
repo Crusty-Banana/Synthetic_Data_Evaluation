@@ -4,20 +4,20 @@ from models import CustomBERTModel
 def main(args):
     if args.action == 'train':
         train_model_with_dataset(model_name=args.model_name, data_path=args.data_path, model_path=args.model_path, checkpoint_path=args.checkpoint_path)
-        print("Training model {} on dataset {}".format(args.model_name, args.data_name))
+        print("Training model {} on dataset {}".format(args.model_name, args.data_path))
     elif args.action == 'inference':
         model = CustomBERTModel()
         model.load_model(args.inference_model)
 
         prediction = model.predict(args.inference_text)
 
-        print("Inference model {} on dataset {}:".format(args.model_name, args.data_name))
+        print("Inference model {} on dataset {}:".format(args.model_name, args.data_path))
         print(f"Input: {args.inference_text}.\nOutput: {prediction}.")
     elif args.action == 'test':
         model = CustomBERTModel()
         model.load_model(args.inference_model)
         
-        print("Validation model {} on dataset {}".format(args.model_name, args.data_name))
+        print("Validation model {} on dataset {}".format(args.model_name, args.data_path))
     
     elif args.action == 'data':
         pass
