@@ -27,7 +27,7 @@ acronym = {
 }
 
 def train_model_with_dataset(model_name="bert-base-multilingual-cased", 
-                             data_name="AIVIVN_2019", 
+                             data_path="", 
                              model_path="",
                              checkpoint_path="models/AIVIVN_2019_model"):
     """Train a model using a dataset.
@@ -35,16 +35,12 @@ def train_model_with_dataset(model_name="bert-base-multilingual-cased",
     Args:
         model_name (string): Name of the model.
         data_name (string): Name of the dataset.
-        model_path (string): Path to save the model.
+        model_path (string): Path to load the model.
+        checkpoint_path (string): Path to save the checkpoint.
     """
     model_name = acronym[model_name]
-    data_name = acronym[data_name]
 
-    train_csv = data_path[data_name]["train"]
-    test_csv = data_path[data_name]["train"]
-
-    train_data = soft_preprocess_df(pd.read_csv(train_csv), data="comment", label="label")
-    test_data = soft_preprocess_df(pd.read_csv(test_csv), data="comment", label="label")
+    train_data = pd.read_csv(data_path)
 
     train_texts, val_texts, train_labels, val_labels = train_test_split(
         train_data['data'].tolist(),
@@ -52,27 +48,24 @@ def train_model_with_dataset(model_name="bert-base-multilingual-cased",
         test_size=0.1,  # 10% validation split
         random_state=42
     )
-    test_texts = test_data['data'].tolist()
-    test_labels = test_data['label'].tolist()
 
     model = CustomBERTModel(model_name=model_name, num_labels=2)
+    if (model_path != ""):
+        model.load_model(model_path)
     
     train_dataset = CustomTextDataset(texts=train_texts, labels=train_labels, tokenizer=model.tokenizer)
     val_dataset = CustomTextDataset(texts=val_texts, labels=val_labels, tokenizer=model.tokenizer)
-    test_dataset = CustomTextDataset(texts=test_texts, labels=test_labels, tokenizer=model.tokenizer)
 
     train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True)
     val_dataloader = DataLoader(val_dataset, batch_size=4, shuffle=False)
-    test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False)
 
     model.train(train_dataloader, val_dataloader, epochs=3, learning_rate=5e-5)
 
     new_text = "This is an amazing example."
     prediction = model.predict(new_text)
     print(f"Predicted label for '{new_text}': {prediction}")
-    model.evaluate(test_dataloader, "cuda")
 
-    model.save_model(model_path + "/" + model_name + "_" + data_name)
+    model.save_model(checkpoint_path)
 
 def inference_model_with_dataset(model_name="bert-base-multilingual-cased", 
                              data_name="AIVIVN_2019", 

@@ -112,3 +112,20 @@ def preprocess_Do(data_path="Experiment_data/Original_dataset/AIVIVN_2019",
     df = soft_preprocess_df(df, data=data, label=label)
     df['data'] = df['data'].str.strip('"')
     df.to_csv(data_path+"/PP-"+input_file)
+
+def sample_data(data_path="", 
+                output_path="", 
+                percent_sample_size=50):
+    df = pd.read_csv(data_path)
+    df = df.sample(frac=percent_sample_size/100)
+    df.to_csv(output_path)
+    return df
+
+def concate_data(data_path1="", 
+                 data_path2="", 
+                 output_path=""):
+    df1 = pd.read_csv(data_path1)
+    df2 = pd.read_csv(data_path2)
+    df = pd.concat([df1, df2])
+    df.to_csv(output_path)
+    return df
