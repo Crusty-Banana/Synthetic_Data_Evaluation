@@ -29,7 +29,7 @@ def translation_request(idx, data):
                 }
             }
 
-def split_into_batchs(df, output_path="data/Flipkart/To_be_translated_batch", batch_size=50000):
+def split_into_batches(df, output_path="Experiment_data/Original_dataset/Flipkart/To_be_translated_batch", batch_size=50000):
     file_count = 0
     line_count = 0
     
@@ -50,7 +50,7 @@ def split_into_batchs(df, output_path="data/Flipkart/To_be_translated_batch", ba
     batch_file.close()
     return file_count
 
-def combine_batchs(original_df_path, translated_batch_path, file_count, output_path):
+def combine_batches(original_df_path, translated_batch_path, file_count, output_path):
     translations = {}
     for i in range(file_count + 1):
         with open(translated_batch_path + f"/batch_{i}.jsonl", "r") as file:
@@ -78,3 +78,37 @@ def compute_metrics(eval_pred):
     logits, labels = eval_pred
     predictions = logits.argmax(axis=-1)
     return {"accuracy": accuracy_score(labels, predictions)}
+
+def split_csv(data_path="Experiment_data/Original_dataset/Flipkart",
+              input_file="Dataset-SA.csv", 
+              data="Summary", 
+              label="Sentiment"):
+    df = pd.read_csv(data_path+"/"+input_file)
+    df = soft_preprocess_df(df, 
+                            data=data, 
+                            label=label)
+    df.to_csv(data_path+"/SP-"+input_file)
+
+    split_into_batches(df=df, 
+                       output_path=data_path+"/To_be_translated_batch", 
+                       batch_size=50000)
+    
+def preprocess_Da(data_path="Experiment_data/Original_dataset/Flipkart",
+                  input_file="Translated-SP-Dataset-SA.csv"):
+    df = pd.read_csv(data_path+"/"+input_file)
+
+    # Select only positive and negative reviews
+    # 0: Negative, 1: Positive
+    df = df[df["label"].isin([0, 2])]
+    df = soft_preprocess_df(df, data="Translated_Data", label="label")
+    df['data'] = df['data'].str.strip('"')
+    df.to_csv(data_path+"/PP-"+input_file)
+
+def preprocess_Do(data_path="Experiment_data/Original_dataset/AIVIVN_2019",
+                  input_file="train.csv",
+                  data="comment",
+                  label="label"):
+    df = pd.read_csv(data_path+"/"+input_file)
+    df = soft_preprocess_df(df, data=data, label=label)
+    df['data'] = df['data'].str.strip('"')
+    df.to_csv(data_path+"/PP-"+input_file)

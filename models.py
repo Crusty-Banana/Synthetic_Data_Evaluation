@@ -1,7 +1,7 @@
 from transformers import (BertForSequenceClassification,
                           BertTokenizer)
-
 import torch
+from tqdm import tqdm  # Import tqdm
 
 # Model Class
 class CustomBERTModel:
@@ -36,7 +36,8 @@ class CustomBERTModel:
         for epoch in range(epochs):
             self.model.train()
             total_loss = 0
-            for batch in train_dataloader:
+            # Wrap the train_dataloader with tqdm to show progress
+            for batch in tqdm(train_dataloader, desc=f"Training Epoch {epoch + 1}/{epochs}", leave=False):
                 optimizer.zero_grad()
 
                 input_ids = batch['input_ids'].to(self.device)
@@ -65,8 +66,9 @@ class CustomBERTModel:
         self.model.eval()
         total, correct = 0, 0
 
+        # Wrap the validation dataloader with tqdm to show progress
         with torch.no_grad():
-            for batch in dataloader:
+            for batch in tqdm(dataloader, desc="Evaluating", leave=False):
                 input_ids = batch['input_ids'].to(device)
                 attention_mask = batch['attention_mask'].to(device)
                 labels = batch['label'].to(device)
@@ -86,9 +88,9 @@ class CustomBERTModel:
             dataloader (DataLoader): DataLoader for validation data.
             device (torch.device): Device to run the evaluation on.
         """
-        self.model.model.eval()
+        self.model.eval()
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model.model.to(device)
+        self.model.to(device)
 
         encoded = self.tokenizer(
             text,
@@ -102,7 +104,7 @@ class CustomBERTModel:
         attention_mask = encoded['attention_mask'].to(device)
 
         with torch.no_grad():
-            outputs = self.model.model(input_ids, attention_mask=attention_mask)
+            outputs = self.model(input_ids, attention_mask=attention_mask)
             logits = outputs.logits
             prediction = torch.argmax(logits, dim=-1).item()
 
