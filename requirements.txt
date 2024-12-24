@@ -1,0 +1,11 @@
+datasets
+pandas
+notebook 
+ipykernel
+scikit-learn
+openai
+dotenv
+python-dotenv
+transformers
+torch
+numpy
