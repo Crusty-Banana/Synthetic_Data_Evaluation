@@ -54,7 +54,7 @@ class CustomBERTModel:
             avg_train_loss = total_loss / len(train_dataloader)
             print(f"Epoch {epoch + 1}/{epochs}, Training Loss: {avg_train_loss:.4f}")
 
-            self.evaluate(val_dataloader, self.device)
+            self.evaluate(val_dataloader)
 
     def evaluate(self, dataloader):
         """Evaluate the model on a validation dataset.
