@@ -1,5 +1,5 @@
 import argparse
-from train import train_model_with_dataset
+from train import train_model_with_dataset, inference_model_with_dataset
 from models import CustomBERTModel
 def main(args):
     if args.action == 'train':
@@ -17,6 +17,7 @@ def main(args):
         model = CustomBERTModel()
         model.load_model(args.inference_model)
         
+        inference_model_with_dataset(model_name=args.model_name, data_path=args.test_data_path, model_path=args.inference_model)
         print("Validation model {} on dataset {}".format(args.model_name, args.data_path))
     
     elif args.action == 'data':
@@ -38,6 +39,6 @@ if __name__ == "__main__":
 
     # For Testing
     parser.add_argument('--test_model', type=str, default="models/bert-base-multilingual-cased_AIVIVN_2019")
-    parser.add_argument('--test_data_name', type=str, default='AIVIVN', choices=['AIVIVN', 'Flipkart', 'UIT-VSFC'])
+    parser.add_argument('--test_data_path', type=str, default="")
     args = parser.parse_args()
     main(args)

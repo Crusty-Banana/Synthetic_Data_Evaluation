@@ -102,6 +102,7 @@ def preprocess_Da(data_path="Experiment_data/Original_dataset/Flipkart",
     df = df[df["label"].isin([0, 2])]
     df = soft_preprocess_df(df, data="Translated_Data", label="label")
     df['data'] = df['data'].str.strip('"')
+    df = df[df['data'].notna() & (df['data'] != "")]
     df.to_csv(data_path+"/PP-"+input_file)
 
 def preprocess_Do(data_path="Experiment_data/Original_dataset/AIVIVN_2019",
@@ -111,6 +112,7 @@ def preprocess_Do(data_path="Experiment_data/Original_dataset/AIVIVN_2019",
     df = pd.read_csv(data_path+"/"+input_file)
     df = soft_preprocess_df(df, data=data, label=label)
     df['data'] = df['data'].str.strip('"')
+    df = df[df['data'].notna() & (df['data'] != "")]
     df.to_csv(data_path+"/PP-"+input_file)
 
 def sample_data(data_path="", 

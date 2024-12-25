@@ -68,24 +68,20 @@ def train_model_with_dataset(model_name="bert-base-multilingual-cased",
     model.save_model(checkpoint_path)
 
 def inference_model_with_dataset(model_name="bert-base-multilingual-cased", 
-                             data_name="AIVIVN_2019", 
-                             model_path="models/AIVIVN_2019_model"):
+                                 data_path="", 
+                                 model_path="models/AIVIVN_2019_model"):
     """Train a model using a dataset.
 
     Args:
         model_name (string): Name of the model.
-        data_name (string): Name of the dataset.
-        model_path (string): Path to save the model.
+        data_path (string): Path of the dataset.
+        model_path (string): Path to load the model.
     """
-    model_name = acronym[model_name]
-    data_name = acronym[data_name]
 
     model = CustomBERTModel()
     model.load_model(model_path)
-    
-    test_csv = data_path[data_name]["train"]
 
-    test_data = soft_preprocess_df(pd.read_csv(test_csv), data="comment", label="label")
+    test_data = pd.read_csv(data_path)
 
     test_texts = test_data['data'].tolist()
     test_labels = test_data['label'].tolist()
@@ -94,6 +90,4 @@ def inference_model_with_dataset(model_name="bert-base-multilingual-cased",
 
     test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False)
 
-    model.evaluate(test_dataloader, "cuda")
-
-    model.save_model(model_path + "/" + model_name + "_" + data_name)
+    model.evaluate(test_dataloader)

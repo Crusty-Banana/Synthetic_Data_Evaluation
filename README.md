@@ -45,7 +45,18 @@ python main_data.py --action sample --data_path Experiment_data/Augmented_datase
 python main_data.py --action sample --data_path Experiment_data/Augmented_dataset/Flipkart.csv --output_path Experiment_data/Augmented_dataset/Flipkart100.csv --percent_sample_size 100
 ```
 
-6. Concate $D_c$ + $D_a$
+### Prepare $D_c$ (Control Data)
+
+```
+python main_data.py --action preprocess_Do --data_name AIVIVN_2019 --input_file train.csv --data comment --label label 
+```
+
+Result is "Experiment_data/Original_dataset/AIVIVN_2019/PP-train.csv"
+
+Change name to AIVIVN.csv and move to "Experiment_data/Control_dataset"
+
+
+1. Concate $D_c$ + $D_a$
 
 ```
 python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/Flipkart10.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart10.csv
@@ -56,16 +67,6 @@ python main_data.py --action concate --data_path1 Experiment_data/Control_datase
 
 python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/Flipkart100.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart100.csv
 ```
-
-### Prepare $D_c$ (Augmented Data)
-
-```
-python main_data.py --action preprocess_Do --data_name AIVIVN_2019 --input_file train.csv --data comment --label label 
-```
-
-Result is "Experiment_data/Original_dataset/AIVIVN_2019/PP-train.csv"
-
-Change name to AIVIVN.csv and move to "Experiment_data/Control_dataset"
 
 ### Prepare Evaluation Data
 
@@ -104,4 +105,17 @@ python main_model.py --action train --data_path Experiment_data/Augmented_datase
 
 ## Evaluate
 
+```
+python main_model.py --action test --model_name mBert_Control --test_model models/mBert_Control --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
+
+python main_model.py --action test --model_name mBert_ControlThenAugment --test_model models/mBert_ControlThenAugment --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
+
+python main_model.py --action test --model_name mBert_Control+Augment10 --test_model models/mBert_Control+Augment10 --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
+
+python main_model.py --action test --model_name mBert_Control+Augment30 --test_model models/mBert_Control+Augment30 --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
+
+python main_model.py --action test --model_name mBert_Control+Augment60 --test_model models/mBert_Control+Augment60 --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
+
+python main_model.py --action test --model_name mBert_Control+Augment100 --test_model models/mBert_Control+Augment100 --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
+```
 TODO

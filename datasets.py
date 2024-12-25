@@ -22,7 +22,8 @@ class CustomTextDataset(Dataset):
     def __getitem__(self, idx):
         text = self.texts[idx]
         label = self.labels[idx]
-
+        if (type(text) != str):
+            print(text)
         # Tokenize the text
         encoded = self.tokenizer(
             text,

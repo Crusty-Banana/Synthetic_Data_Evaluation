@@ -5,7 +5,7 @@ from tqdm import tqdm  # Import tqdm
 
 # Model Class
 class CustomBERTModel:
-    def __init__(self, model_name='bert-base-multilingual-cased', num_labels=2, device="cuda"):
+    def __init__(self, model_name='bert-base-multilingual-cased', num_labels=2, device="cuda:0"):
         """Initialize the BERT model for classification.
 
         Args:
@@ -56,22 +56,22 @@ class CustomBERTModel:
 
             self.evaluate(val_dataloader, self.device)
 
-    def evaluate(self, dataloader, device):
+    def evaluate(self, dataloader):
         """Evaluate the model on a validation dataset.
 
         Args:
             dataloader (DataLoader): DataLoader for validation data.
-            device (torch.device): Device to run the evaluation on.
         """
+        self.model.to(self.device)
         self.model.eval()
         total, correct = 0, 0
 
         # Wrap the validation dataloader with tqdm to show progress
         with torch.no_grad():
             for batch in tqdm(dataloader, desc="Evaluating", leave=False):
-                input_ids = batch['input_ids'].to(device)
-                attention_mask = batch['attention_mask'].to(device)
-                labels = batch['label'].to(device)
+                input_ids = batch['input_ids'].to(self.device)
+                attention_mask = batch['attention_mask'].to(self.device)
+                labels = batch['label'].to(self.device)
 
                 outputs = self.model(input_ids, attention_mask=attention_mask)
                 predictions = torch.argmax(outputs.logits, dim=-1)
@@ -86,11 +86,9 @@ class CustomBERTModel:
 
         Args:
             dataloader (DataLoader): DataLoader for validation data.
-            device (torch.device): Device to run the evaluation on.
         """
         self.model.eval()
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model.to(device)
+        self.model.to(self.device)
 
         encoded = self.tokenizer(
             text,
@@ -100,8 +98,8 @@ class CustomBERTModel:
             return_tensors='pt'
         )
 
-        input_ids = encoded['input_ids'].to(device)
-        attention_mask = encoded['attention_mask'].to(device)
+        input_ids = encoded['input_ids'].to(self.device)
+        attention_mask = encoded['attention_mask'].to(self.device)
 
         with torch.no_grad():
             outputs = self.model(input_ids, attention_mask=attention_mask)
