@@ -1,10 +1,40 @@
 from transformers import (BertForSequenceClassification,
-                          BertTokenizer)
+                          BertTokenizer,
+                          BertModel)
 import torch
 from tqdm import tqdm  # Import tqdm
+import torch as _torch
+import torch.nn as _nn
+import torch.nn.functional as _F
 
 # Model Class
 class CustomBERTModel:
+    class CustomModel(_nn.Module):
+        def __init__(self,
+                     out_channels: int, 
+                     intermediate_dim: int=256,
+                     model_name: str='bert-base-multilingual-cased'):
+            super().__init__()
+            self.bert = BertModel.from_pretrained(model_name)
+            self.fc1 = _nn.Linear(768, intermediate_dim)  
+            self.fc2 = _nn.Linear(intermediate_dim, intermediate_dim) 
+            self.fc3 = _nn.Linear(intermediate_dim, out_channels) 
+            self.relu = _nn.ReLU()
+            self.dropout = _nn.Dropout(0.3) 
+
+        def forward(self, input_ids, attention_mask):
+            # Pass inputs through BERT
+            outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+            pooled_output = outputs.pooler_output  # [CLS] token representation
+            
+            # Pass through fully connected layers
+            x = self.relu(self.fc1(pooled_output))
+            x = self.dropout(x)
+            x = self.relu(self.fc2(x))
+            x = self.dropout(x)
+            logits = self.fc2(x)
+            return logits
+
     def __init__(self, model_name='bert-base-multilingual-cased', num_labels=2, device="cuda:0"):
         """Initialize the BERT model for classification.
 
@@ -12,10 +42,7 @@ class CustomBERTModel:
             model_name (str): Pre-trained BERT model name.
             num_labels (int): Number of output labels.
         """
-        self.model = BertForSequenceClassification.from_pretrained(
-            model_name,
-            num_labels=num_labels
-        )
+        self.model = self.CustomModel(model_name=model_name, out_channels=num_labels)
         self.tokenizer = BertTokenizer.from_pretrained(model_name)
         self.device = device
 
@@ -44,8 +71,8 @@ class CustomBERTModel:
                 attention_mask = batch['attention_mask'].to(self.device)
                 labels = batch['label'].to(self.device)
 
-                outputs = self.model(input_ids, attention_mask=attention_mask, labels=labels)
-                loss = outputs.loss
+                logits = self.model(input_ids, attention_mask=attention_mask)
+                loss = criterion(logits, labels)
                 loss.backward()
                 optimizer.step()
 
@@ -54,7 +81,7 @@ class CustomBERTModel:
             avg_train_loss = total_loss / len(train_dataloader)
             print(f"Epoch {epoch + 1}/{epochs}, Training Loss: {avg_train_loss:.4f}")
 
-            self.evaluate(val_dataloader)
+            self.evaluate(val_dataloader)   
 
     def evaluate(self, dataloader):
         """Evaluate the model on a validation dataset.
@@ -73,8 +100,8 @@ class CustomBERTModel:
                 attention_mask = batch['attention_mask'].to(self.device)
                 labels = batch['label'].to(self.device)
 
-                outputs = self.model(input_ids, attention_mask=attention_mask)
-                predictions = torch.argmax(outputs.logits, dim=-1)
+                logits = self.model(input_ids, attention_mask=attention_mask)
+                predictions = torch.argmax(logits, dim=-1)
                 total += labels.size(0)
                 correct += (predictions == labels).sum().item()
 
@@ -102,8 +129,7 @@ class CustomBERTModel:
         attention_mask = encoded['attention_mask'].to(self.device)
 
         with torch.no_grad():
-            outputs = self.model(input_ids, attention_mask=attention_mask)
-            logits = outputs.logits
+            logits = self.model(input_ids, attention_mask=attention_mask)
             prediction = torch.argmax(logits, dim=-1).item()
 
         return prediction
@@ -114,7 +140,8 @@ class CustomBERTModel:
         Args:
             save_path (str): Path to save the model.
         """
-        self.model.save_pretrained(save_path)
+        torch.save(self.model, save_path)
+
         print(f"Model saved to {save_path}")
 
     def load_model(self, load_path):
@@ -123,5 +150,5 @@ class CustomBERTModel:
         Args:
             load_path (str): Path to load the model from.
         """
-        self.model = BertForSequenceClassification.from_pretrained(load_path)
+        self.model = torch.load(load_path)
         print(f"Model loaded from {load_path}")

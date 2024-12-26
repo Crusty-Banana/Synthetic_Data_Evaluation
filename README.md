@@ -118,4 +118,8 @@ python main_model.py --action test --model_name mBert_Control+Augment60 --test_m
 
 python main_model.py --action test --model_name mBert_Control+Augment100 --test_model models/mBert_Control+Augment100 --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
 ```
-TODO
+### TODO:
+
+Better evaluation
+Hyper param tune model
+add MLP layer at the end of the model
