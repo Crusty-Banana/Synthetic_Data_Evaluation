@@ -14,10 +14,7 @@ def main(args):
         print("Inference model {} on dataset {}:".format(args.model_name, args.data_path))
         print(f"Input: {args.inference_text}.\nOutput: {prediction}.")
     elif args.action == 'test':
-        model = CustomBERTModel()
-        model.load_model(args.inference_model)
-        
-        inference_model_with_dataset(model_name=args.model_name, data_path=args.test_data_path, model_path=args.inference_model)
+        inference_model_with_dataset(model_name=args.model_name, data_path=args.test_data_path, model_path=args.test_model)
         print("Validation model {} on dataset {}".format(args.model_name, args.data_path))
     
     elif args.action == 'data':

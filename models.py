@@ -46,7 +46,7 @@ class CustomBERTModel:
         self.tokenizer = BertTokenizer.from_pretrained(model_name)
         self.device = device
 
-    def train(self, train_dataloader, val_dataloader, epochs=3, learning_rate=5e-5):
+    def train(self, train_dataloader, val_dataloader, epochs=10, learning_rate=1e-3):
         """Train the BERT model.
 
         Args:
@@ -59,6 +59,7 @@ class CustomBERTModel:
 
         optimizer = torch.optim.AdamW(self.model.parameters(), lr=learning_rate)
         criterion = torch.nn.CrossEntropyLoss()
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
 
         for epoch in range(epochs):
             self.model.train()
@@ -77,7 +78,8 @@ class CustomBERTModel:
                 optimizer.step()
 
                 total_loss += loss.item()
-
+                
+            scheduler.step()
             avg_train_loss = total_loss / len(train_dataloader)
             print(f"Epoch {epoch + 1}/{epochs}, Training Loss: {avg_train_loss:.4f}")
 
@@ -140,7 +142,7 @@ class CustomBERTModel:
         Args:
             save_path (str): Path to save the model.
         """
-        torch.save(self.model, save_path)
+        torch.save(self.model, save_path+".pth")
 
         print(f"Model saved to {save_path}")
 
@@ -150,5 +152,5 @@ class CustomBERTModel:
         Args:
             load_path (str): Path to load the model from.
         """
-        self.model = torch.load(load_path)
+        self.model = torch.load(load_path+".pth")
         print(f"Model loaded from {load_path}")

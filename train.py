@@ -59,7 +59,7 @@ def train_model_with_dataset(model_name="bert-base-multilingual-cased",
     train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True)
     val_dataloader = DataLoader(val_dataset, batch_size=4, shuffle=False)
 
-    model.train(train_dataloader, val_dataloader, epochs=3, learning_rate=5e-5)
+    model.train(train_dataloader, val_dataloader, epochs=10, learning_rate=1e-3)
 
     new_text = "This is an amazing example."
     prediction = model.predict(new_text)
@@ -91,3 +91,4 @@ def inference_model_with_dataset(model_name="bert-base-multilingual-cased",
     test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False)
 
     model.evaluate(test_dataloader)
+

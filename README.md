@@ -88,19 +88,19 @@ python main_model.py --action train --data_path Experiment_data/Control_dataset/
 ### mBERT on $D_c$ then $D_a$
 
 ```
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/Flipkart10.csv --model_name mBERT --checkpoint_path models/mBert_ControlThenAugment --model_path models/mBert_Control
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/Flipkart10.csv --model_name mBERT --checkpoint_path models/mBert_ControlThenAugment10 --model_path models/mBert_Control
 ```
 
 ### mBERT on $D_c$ + $D_a$
 
 ```
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/Flipkart10.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment10
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart10.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment10
 
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/Flipkart30.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment30
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart30.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment30
 
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/Flipkart60.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment60
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart60.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment60
 
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/Flipkart100.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment100
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart100.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment100
 ```
 
 ## Evaluate
@@ -108,7 +108,7 @@ python main_model.py --action train --data_path Experiment_data/Augmented_datase
 ```
 python main_model.py --action test --model_name mBert_Control --test_model models/mBert_Control --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
 
-python main_model.py --action test --model_name mBert_ControlThenAugment --test_model models/mBert_ControlThenAugment --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
+python main_model.py --action test --model_name mBert_ControlThenAugment10 --test_model models/mBert_ControlThenAugment10 --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
 
 python main_model.py --action test --model_name mBert_Control+Augment10 --test_model models/mBert_Control+Augment10 --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
 
