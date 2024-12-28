@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser.add_argument('--inference_text', type=str, default='sản phẩm bị lỗi', help='Inference Text')
 
     # For Testing
-    parser.add_argument('--test_model', type=str, default="models/bert-base-multilingual-cased_AIVIVN_2019")
+    parser.add_argument('--test_model', type=str, default="")
     parser.add_argument('--test_data_path', type=str, default="")
     args = parser.parse_args()
     main(args)

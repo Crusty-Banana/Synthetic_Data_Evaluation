@@ -106,6 +106,8 @@ python main_model.py --action train --data_path Experiment_data/Augmented_datase
 ## Evaluate
 
 ```
+python main_model.py --action test --model_name mental_check --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
+
 python main_model.py --action test --model_name mBert_Control --test_model models/mBert_Control --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv
 
 python main_model.py --action test --model_name mBert_ControlThenAugment10 --test_model models/mBert_ControlThenAugment10 --test_data_path Experiment_data/Evaluation_dataset/AIVIVN.csv

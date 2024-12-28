@@ -79,7 +79,8 @@ def inference_model_with_dataset(model_name="bert-base-multilingual-cased",
     """
 
     model = CustomBERTModel()
-    model.load_model(model_path)
+    if (model_path != ""):
+        model.load_model(model_path)
 
     test_data = pd.read_csv(data_path)
 

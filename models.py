@@ -35,7 +35,7 @@ class CustomBERTModel:
             logits = self.fc2(x)
             return logits
 
-    def __init__(self, model_name='bert-base-multilingual-cased', num_labels=2, device="cuda:0"):
+    def __init__(self, model_name='bert-base-multilingual-cased', num_labels=2, device="cuda:2"):
         """Initialize the BERT model for classification.
 
         Args:
@@ -59,7 +59,7 @@ class CustomBERTModel:
 
         optimizer = torch.optim.AdamW(self.model.parameters(), lr=learning_rate)
         criterion = torch.nn.CrossEntropyLoss()
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
         for epoch in range(epochs):
             self.model.train()
@@ -78,7 +78,7 @@ class CustomBERTModel:
                 optimizer.step()
 
                 total_loss += loss.item()
-                
+
             scheduler.step()
             avg_train_loss = total_loss / len(train_dataloader)
             print(f"Epoch {epoch + 1}/{epochs}, Training Loss: {avg_train_loss:.4f}")
