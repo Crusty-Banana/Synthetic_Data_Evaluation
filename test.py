@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv('Experiment_data/Augmented_dataset/Flipkart.csv')
+df = pd.read_csv('Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart10.csv')
 
 non_str_data = df[~df['data'].apply(lambda x: isinstance(x, str))]
 if non_str_data.empty:

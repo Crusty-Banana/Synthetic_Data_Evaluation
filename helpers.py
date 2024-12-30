@@ -128,6 +128,23 @@ def concate_data(data_path1="",
                  output_path=""):
     df1 = pd.read_csv(data_path1, index_col=0)
     df2 = pd.read_csv(data_path2, index_col=0)
+
     df = pd.concat([df1, df2])
     df.to_csv(output_path)
     return df
+
+def balance_the_data(data_path, output_path):
+    df = pd.read_csv(data_path, index_col=0)
+    
+    df_label_0 = df[df["label"] == 0]
+    df_label_1 = df[df["label"] == 1]
+    
+    max_size = min(len(df_label_0), len(df_label_1))
+
+    df_label_0 = df_label_0.sample(n=max_size)
+    df_label_1 = df_label_1.sample(n=max_size)
+
+    df = pd.concat([df_label_0, df_label_1])
+    df = df.sample(frac=1)
+
+    df.to_csv(output_path)

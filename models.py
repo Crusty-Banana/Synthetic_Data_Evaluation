@@ -1,9 +1,13 @@
 from transformers import (BertForSequenceClassification,
                           BertTokenizer,
-                          BertModel)
+                          BertModel,
+                          AutoTokenizer,
+                          AutoModel)
 import torch
 from tqdm import tqdm  # Import tqdm
 import torch as _torch
+from sklearn.metrics import confusion_matrix
+import numpy as np
 import torch.nn as _nn
 import torch.nn.functional as _F
 
@@ -11,31 +15,28 @@ import torch.nn.functional as _F
 class CustomBERTModel:
     class CustomModel(_nn.Module):
         def __init__(self,
-                     out_channels: int, 
-                     intermediate_dim: int=256,
-                     model_name: str='bert-base-multilingual-cased'):
+                     model_name: str,
+                     out_channels: int):
             super().__init__()
-            self.bert = BertModel.from_pretrained(model_name)
-            self.fc1 = _nn.Linear(768, intermediate_dim)  
-            self.fc2 = _nn.Linear(intermediate_dim, intermediate_dim) 
-            self.fc3 = _nn.Linear(intermediate_dim, out_channels) 
+            self.bert = BertModel.from_pretrained(model_name, output_hidden_states=True)
+            self.fc1 = _nn.Linear(768*3, 500)  
+            self.fc2 = _nn.Linear(500, 250) 
+            self.fc3 = _nn.Linear(250, out_channels) 
             self.relu = _nn.ReLU()
-            self.dropout = _nn.Dropout(0.3) 
+            self.dropout = _nn.Dropout(0) 
 
         def forward(self, input_ids, attention_mask):
             # Pass inputs through BERT
             outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-            pooled_output = outputs.pooler_output  # [CLS] token representation
+            cls_embeddings = torch.cat([state[:, 0, :] for state in outputs.hidden_states[-3:]], dim=1)
             
             # Pass through fully connected layers
-            x = self.relu(self.fc1(pooled_output))
-            x = self.dropout(x)
-            x = self.relu(self.fc2(x))
-            x = self.dropout(x)
-            logits = self.fc2(x)
+            x = self.dropout(self.relu(self.fc1(cls_embeddings)))
+            x = self.dropout(self.relu(self.fc2(x)))
+            logits = self.fc3(x)
             return logits
 
-    def __init__(self, model_name='bert-base-multilingual-cased', num_labels=2, device="cuda:2"):
+    def __init__(self, model_name="google-bert/bert-base-multilingual-cased", num_labels=2, device="cuda:0"):
         """Initialize the BERT model for classification.
 
         Args:
@@ -59,7 +60,7 @@ class CustomBERTModel:
 
         optimizer = torch.optim.AdamW(self.model.parameters(), lr=learning_rate)
         criterion = torch.nn.CrossEntropyLoss()
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.5)
 
         for epoch in range(epochs):
             self.model.train()
@@ -86,14 +87,17 @@ class CustomBERTModel:
             self.evaluate(val_dataloader)   
 
     def evaluate(self, dataloader):
-        """Evaluate the model on a validation dataset.
+        """Evaluate the model on a validation dataset and print the confusion matrix.
 
         Args:
             dataloader (DataLoader): DataLoader for validation data.
         """
+
         self.model.to(self.device)
         self.model.eval()
         total, correct = 0, 0
+        all_labels = []
+        all_predictions = []
 
         # Wrap the validation dataloader with tqdm to show progress
         with torch.no_grad():
@@ -107,8 +111,16 @@ class CustomBERTModel:
                 total += labels.size(0)
                 correct += (predictions == labels).sum().item()
 
+                all_labels.extend(labels.cpu().numpy())
+                all_predictions.extend(predictions.cpu().numpy())
+
         accuracy = correct / total
         print(f"Validation Accuracy: {accuracy:.4f}")
+
+        # Compute and print confusion matrix
+        cm = confusion_matrix(all_labels, all_predictions)
+        print("Confusion Matrix:")
+        print(cm)
 
     def predict(self, text, max_length=128):
         """Perform inference on a single text.

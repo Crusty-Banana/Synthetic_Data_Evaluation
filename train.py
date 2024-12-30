@@ -41,25 +41,26 @@ def train_model_with_dataset(model_name="bert-base-multilingual-cased",
     model_name = acronym[model_name]
 
     train_data = pd.read_csv(data_path)
+    train_data = train_data.sample(frac=1, random_state=42).reset_index(drop=True)
 
     train_texts, val_texts, train_labels, val_labels = train_test_split(
         train_data['data'].tolist(),
         train_data['label'].tolist(),
-        test_size=0.1,  # 10% validation split
+        test_size=0.005,
         random_state=42
     )
 
-    model = CustomBERTModel(model_name=model_name, num_labels=2)
+    model = CustomBERTModel(num_labels=2)
     if (model_path != ""):
         model.load_model(model_path)
     
     train_dataset = CustomTextDataset(texts=train_texts, labels=train_labels, tokenizer=model.tokenizer)
     val_dataset = CustomTextDataset(texts=val_texts, labels=val_labels, tokenizer=model.tokenizer)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-    val_dataloader = DataLoader(val_dataset, batch_size=4, shuffle=False)
+    train_dataloader = DataLoader(train_dataset, batch_size=50, shuffle=True)
+    val_dataloader = DataLoader(val_dataset, batch_size=50, shuffle=False)
 
-    model.train(train_dataloader, val_dataloader, epochs=10, learning_rate=1e-3)
+    model.train(train_dataloader, val_dataloader, epochs=10, learning_rate=3e-5)
 
     new_text = "This is an amazing example."
     prediction = model.predict(new_text)

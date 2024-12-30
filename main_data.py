@@ -4,7 +4,8 @@ from helpers import (split_csv,
                      preprocess_Da, 
                      preprocess_Do, 
                      sample_data, 
-                     concate_data)
+                     concate_data,
+                     balance_the_data)
 
 def main(args):
     if args.action == 'split':
@@ -22,11 +23,13 @@ def main(args):
         sample_data(data_path=args.data_path, output_path=args.output_path, percent_sample_size=args.percent_sample_size)
     elif args.action == 'concate':
         concate_data(data_path1=args.data_path1, data_path2=args.data_path2, output_path=args.output_path)
-
+    elif args.action == 'balance':
+        balance_the_data(data_path=args.data_path, output_path=args.output_path)
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Synthetic Data Impacts")
 
-    parser.add_argument('--action', type=str, default='split', choices=['split', 'combine', 'preprocess_Da', 'preprocess_Do', 'sample', 'concate'], help='Action to perform: train or inference or validation')
+    parser.add_argument('--action', type=str, default='split', choices=['split', 'combine', 'preprocess_Da', 'preprocess_Do', 'sample', 'concate', 'balance'], help='Action to perform: train or inference or validation')
     
     # Split & combine
     parser.add_argument('--data_name', type=str, default='Flipkart', choices=['AIVIVN_2019', 'Flipkart', 'UIT_VSFC'], help='name of dataset')

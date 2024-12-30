@@ -45,6 +45,17 @@ python main_data.py --action sample --data_path Experiment_data/Augmented_datase
 python main_data.py --action sample --data_path Experiment_data/Augmented_dataset/Flipkart.csv --output_path Experiment_data/Augmented_dataset/Flipkart100.csv --percent_sample_size 100
 ```
 
+6. Balance the data.
+
+```
+python main_data.py --action balance --data_path Experiment_data/Augmented_dataset/Flipkart10.csv --output_path Experiment_data/Augmented_dataset/BalanceFlipkart10.csv
+
+python main_data.py --action balance --data_path Experiment_data/Augmented_dataset/Flipkart30.csv --output_path Experiment_data/Augmented_dataset/BalanceFlipkart30.csv
+
+python main_data.py --action balance --data_path Experiment_data/Augmented_dataset/Flipkart60.csv --output_path Experiment_data/Augmented_dataset/BalanceFlipkart60.csv
+
+python main_data.py --action balance --data_path Experiment_data/Augmented_dataset/Flipkart100.csv --output_path Experiment_data/Augmented_dataset/BalanceFlipkart100.csv
+```
 ### Prepare $D_c$ (Control Data)
 
 ```
@@ -59,13 +70,14 @@ Change name to AIVIVN.csv and move to "Experiment_data/Control_dataset"
 1. Concate $D_c$ + $D_a$
 
 ```
-python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/Flipkart10.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart10.csv
+python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/BalanceFlipkart10.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart10.csv
 
-python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/Flipkart30.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart30.csv
+python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/BalanceFlipkart30.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart30.csv
 
-python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/Flipkart60.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart60.csv
+python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/BalanceFlipkart60.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart60.csv
 
-python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/Flipkart100.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart100.csv
+python main_data.py --action concate --data_path1 Experiment_data/Control_dataset/AIVIVN.csv --data_path2 Experiment_data/Augmented_dataset/BalanceFlipkart100.csv --output_path Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart100.csv
+
 ```
 
 ### Prepare Evaluation Data
@@ -88,19 +100,20 @@ python main_model.py --action train --data_path Experiment_data/Control_dataset/
 ### mBERT on $D_c$ then $D_a$
 
 ```
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/Flipkart10.csv --model_name mBERT --checkpoint_path models/mBert_ControlThenAugment10 --model_path models/mBert_Control
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/BalanceFlipkart10.csv --model_name mBERT --checkpoint_path models/mBert_ControlThenAugment10 --model_path models/mBert_Control
 ```
 
 ### mBERT on $D_c$ + $D_a$
 
 ```
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart10.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment10
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart10.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment10
 
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart30.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment30
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart30.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment30
 
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart60.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment60
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart60.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment60
 
-python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+Flipkart100.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment100
+python main_model.py --action train --data_path Experiment_data/Augmented_dataset/AIVIVN+BalanceFlipkart100.csv --model_name mBERT --checkpoint_path models/mBert_Control+Augment100
+
 ```
 
 ## Evaluate
