@@ -1,12 +1,18 @@
 import argparse
 from train import train_model_with_dataset, inference_model_with_dataset
 from models import CustomBERTModel
+
 def main(args):
     if args.action == 'train':
-        train_model_with_dataset(model_name=args.model_name, data_path=args.data_path, model_path=args.model_path, checkpoint_path=args.checkpoint_path)
+        train_model_with_dataset(model_name=args.model_name, 
+                                 data_path=args.data_path, 
+                                 model_path=args.model_path, 
+                                 checkpoint_path=args.checkpoint_path, 
+                                 batch_size=args.batch_size,
+                                 device=args.device)
         print("Training model {} on dataset {}".format(args.model_name, args.data_path))
     elif args.action == 'inference':
-        model = CustomBERTModel()
+        model = CustomBERTModel(device=args.device)
         model.load_model(args.inference_model)
 
         prediction = model.predict(args.inference_text)
@@ -14,11 +20,12 @@ def main(args):
         print("Inference model {} on dataset {}:".format(args.model_name, args.data_path))
         print(f"Input: {args.inference_text}.\nOutput: {prediction}.")
     elif args.action == 'test':
-        inference_model_with_dataset(model_name=args.model_name, data_path=args.test_data_path, model_path=args.test_model)
+        inference_model_with_dataset(model_name=args.model_name, 
+                                     data_path=args.test_data_path, 
+                                     model_path=args.test_model,
+                                     batch_size=args.batch_size,
+                                     device=args.device)
         print("Validation model {} on dataset {}".format(args.model_name, args.data_path))
-    
-    elif args.action == 'data':
-        pass
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Synthetic Data Impacts")
 
@@ -37,5 +44,10 @@ if __name__ == "__main__":
     # For Testing
     parser.add_argument('--test_model', type=str, default="")
     parser.add_argument('--test_data_path', type=str, default="")
+
+    # Details
+    parser.add_argument('--device', type=str, default="cuda:0")
+    parser.add_argument('--batch_size', type=int, default="4")
+
     args = parser.parse_args()
     main(args)

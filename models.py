@@ -36,7 +36,7 @@ class CustomBERTModel:
             logits = self.fc3(x)
             return logits
 
-    def __init__(self, model_name="google-bert/bert-base-multilingual-cased", num_labels=2, device="cuda:0"):
+    def __init__(self, model_name="google-bert/bert-base-multilingual-cased", num_labels=2, device="cuda:1"):
         """Initialize the BERT model for classification.
 
         Args:

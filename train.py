@@ -29,7 +29,8 @@ acronym = {
 def train_model_with_dataset(model_name="bert-base-multilingual-cased", 
                              data_path="", 
                              model_path="",
-                             checkpoint_path="models/AIVIVN_2019_model"):
+                             checkpoint_path="models/AIVIVN_2019_model",
+                             batch_size=4, device="cpu"):
     """Train a model using a dataset.
 
     Args:
@@ -50,15 +51,15 @@ def train_model_with_dataset(model_name="bert-base-multilingual-cased",
         random_state=42
     )
 
-    model = CustomBERTModel(num_labels=2)
+    model = CustomBERTModel(device=device)
     if (model_path != ""):
         model.load_model(model_path)
     
     train_dataset = CustomTextDataset(texts=train_texts, labels=train_labels, tokenizer=model.tokenizer)
     val_dataset = CustomTextDataset(texts=val_texts, labels=val_labels, tokenizer=model.tokenizer)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=50, shuffle=True)
-    val_dataloader = DataLoader(val_dataset, batch_size=50, shuffle=False)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
     model.train(train_dataloader, val_dataloader, epochs=10, learning_rate=3e-5)
 
@@ -70,7 +71,8 @@ def train_model_with_dataset(model_name="bert-base-multilingual-cased",
 
 def inference_model_with_dataset(model_name="bert-base-multilingual-cased", 
                                  data_path="", 
-                                 model_path="models/AIVIVN_2019_model"):
+                                 model_path="models/AIVIVN_2019_model",
+                                 batch_size=4, device="cpu"):
     """Train a model using a dataset.
 
     Args:
@@ -79,7 +81,7 @@ def inference_model_with_dataset(model_name="bert-base-multilingual-cased",
         model_path (string): Path to load the model.
     """
 
-    model = CustomBERTModel()
+    model = CustomBERTModel(device=device)
     if (model_path != ""):
         model.load_model(model_path)
 
@@ -90,7 +92,7 @@ def inference_model_with_dataset(model_name="bert-base-multilingual-cased",
 
     test_dataset = CustomTextDataset(texts=test_texts, labels=test_labels, tokenizer=model.tokenizer)
 
-    test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False)
+    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     model.evaluate(test_dataloader)
 
